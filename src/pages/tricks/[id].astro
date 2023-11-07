@@ -1,0 +1,128 @@
+---
+import LoadCollection from '@/components/LoadCollection';
+import SelectCategory from '@/components/SelectCategory';
+import TrickCard from '@/components/TrickCard.astro';
+import Layout from '@/layouts/Layout.astro';
+import { serverClient } from '@/supabase';
+import TrickProvider from '@/modules/tricks/provider';
+
+export async function getStaticPaths() {
+  const supabase = serverClient();
+  const trickProvider = new TrickProvider(supabase);
+  const { data: tricks } = await trickProvider.getTricks({}); // TODO: fix type, should work with no args
+
+  return tricks?.map((trick) => ({
+    params: { id: trick.id },
+    props: { trick },
+  }));
+}
+
+const supabase = serverClient();
+
+const { trick } = Astro.props;
+
+const trickProvider = new TrickProvider(supabase);
+
+const videos = await trickProvider.getTrickVideos(trick.id);
+
+const { data: prerequisites } = await trickProvider.getTricks({
+  filter: { in: { key: 'id', values: trick.prerequisites } },
+});
+---
+
+<Layout title={trick.name}>
+  <main
+    class='grid grid-cols-1 lg:grid-cols-[3fr_1fr] p-4 md:p-8 lg:p-10'
+    data-trickIds={[trick.id]}
+  >
+    <div class='@md:ml-52'>
+      <h1 class='text-3xl mb-6'>{trick.name}</h1>
+      <div class='flex gap-2 flex-wrap mb-6 lg:mb-10'>
+        <a
+          class='badge badge-primary capitalize p-3'
+          href=`/tricks/difficulty/${trick.difficulty}`>{trick.difficulty}</a
+        >
+        {
+          trick.types &&
+            trick.types.length > 0 &&
+            trick.types.map((type: string) => (
+              <div class='badge badge-secondary capitalize p-3'>{type}</div>
+            ))
+        }
+        <SelectCategory trickId={trick.id} client:load />
+      </div>
+      <div class='lg:hidden mb-10'>
+        <h2 class='text-2xl mb-4'>Prerequisites</h2>
+        <div class='flex gap-2 flex-col'>
+          {
+            prerequisites?.map((trick) => (
+              <a href={`/tricks/${trick.id}`} class='block'>
+                {trick.name}
+                <div class='badge badge-secondary ml-2 capitalize'>
+                  {trick.difficulty}
+                </div>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+      {
+        videos?.map((v) =>
+          v.source === 'youtube' ? (
+            <div class='relative'>
+              <iframe
+                class='w-full max-w-2xl aspect-video rounded-2xl'
+                src={`https://www.youtube.com/embed/${v.externalId}`}
+                allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                allowfullscreen=''
+              />
+            </div>
+          ) : (
+            <video controls class='w-full max-w-2xl aspect-video'>
+              <source src={v.externalId} />
+            </video>
+          )
+        )
+      }
+    </div>
+    <div class='hidden lg:block'>
+      <h2 class='text-2xl mb-6'>Prerequisites</h2>
+      {
+        prerequisites?.map((trick) => (
+          <TrickCard
+            id={trick.id}
+            name={trick.name}
+            types={trick.types ?? []}
+          />
+        ))
+      }
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import AuthProvider from '@/modules/auth/provider';
+  import CollectionProvider from '@/modules/collections/provider';
+  import { getTrickIdsFromMain } from '@/modules/tricks/utils';
+  import { setCollections } from '@/modules/collections/store';
+  import { setCurrentUserId, onUserChange } from '@/modules/user/store';
+  import { createComponentClient } from '@/supabase';
+
+  const supabase = createComponentClient();
+  const authProvider = new AuthProvider(supabase);
+  const collectionProvider = new CollectionProvider(supabase);
+
+  const trickIds = getTrickIdsFromMain();
+
+  authProvider.onAuthChange(setCurrentUserId);
+
+  onUserChange(async ({ userId }) => {
+    if (userId) {
+      const collections = await collectionProvider.getCollections({
+        userId,
+        trickIds,
+      });
+      setCollections(collections);
+    }
+  });
+</script>

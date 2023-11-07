@@ -1,0 +1,21 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  trickId: string;
+  name: string;
+  className: string;
+}
+
+const { trickId, name, className } = Astro.props;
+const previewUrl = `https://kmgyjzhtpelimdsqmkbt.supabase.co/storage/v1/object/public/preview/${trickId}.webp`;
+const previewAlt = `Preview of ${name}`;
+---
+
+<Image
+  src={previewUrl}
+  alt={previewAlt}
+  class={className}
+  width={453}
+  height={270}
+/>

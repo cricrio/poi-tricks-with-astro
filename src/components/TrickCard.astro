@@ -1,0 +1,39 @@
+---
+import PreviewImage from './PreviewImage.astro';
+import SelectCategory from './SelectCategory';
+interface Props {
+  id: string;
+  name: string;
+  types: string[];
+}
+
+const { name, id, types } = Astro.props;
+---
+
+<div class='card card-compact bg-base-100 shadow-xl border border-base-content'>
+  <figure>
+    <a href={`/tricks/${id}`} class='flex-1'>
+      <PreviewImage
+        trickId={id}
+        name={name}
+        className='w-full max-w-2xl aspect-video'
+      />
+    </a>
+  </figure>
+  <div class='card-body'>
+    <a href={`/tricks/${id}`}>
+      <h2 class='card-title'>{name}</h2>
+      <!-- <SelectCategory client:only trickId={id} /> -->
+    </a>
+    <div class='flex gap-2 flex-wrap'>
+      {
+        types &&
+          types.length > 0 &&
+          types.map((type) => (
+            <div class='badge badge-secondary  p-3'>{type}</div>
+          ))
+      }
+      <SelectCategory client:only trickId={id} />
+    </div>
+  </div>
+</div>
