@@ -19,7 +19,7 @@ const trickProvider = new TrickProvider(supabase);
 
 const { difficulty } = Astro.params;
 const { data: tricks } = await trickProvider.getTricks({
-  filter: { eq: { key: 'difficulty', value: difficulty as string } }, // TODO Type: is as string really needed
+  filter: { eq: { key: 'difficulty', value: difficulty as string } }, // TODO Type: is as string really needed ?
 });
 ---
 
@@ -34,6 +34,7 @@ const { data: tricks } = await trickProvider.getTricks({
         tricks?.map((trick) => (
           <TrickCard
             id={trick.id}
+            preview={trick.preview}
             name={trick.name}
             types={trick.types ?? []}
           />

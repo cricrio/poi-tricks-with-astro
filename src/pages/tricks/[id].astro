@@ -64,37 +64,41 @@ const { data: prerequisites } = await trickProvider.getTricks({
           }
         </div>
       </div>
-      {
-        videos?.map((v) =>
-          v.source === 'youtube' ? (
-            <div class='relative'>
-              <iframe
-                class='w-full max-w-2xl aspect-video rounded-2xl'
-                src={`https://www.youtube.com/embed/${v.externalId}`}
-                allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                allowfullscreen=''
-              />
-            </div>
-          ) : (
-            <video controls class='w-full max-w-2xl aspect-video'>
-              <source src={v.externalId} />
-            </video>
+      <div class='flex gap-4 flex-col'>
+        {
+          videos?.map((v) =>
+            v.source === 'youtube' ? (
+              <div class='relative'>
+                <iframe
+                  class='w-full max-w-2xl aspect-video rounded-2xl'
+                  src={`https://www.youtube.com/embed/${v.externalId}`}
+                  allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                  allowfullscreen=''
+                />
+              </div>
+            ) : (
+              <video controls class='w-full max-w-2xl aspect-video'>
+                <source src={v.externalId} />
+              </video>
+            )
           )
-        )
-      }
+        }
+      </div>
     </div>
     <div class='hidden lg:block'>
       <h2 class='text-2xl mb-6'>Prerequisites</h2>
-      {
-        prerequisites?.map((trick) => (
-          <TrickCard
-            preview={trick.preview}
-            id={trick.id}
-            name={trick.name}
-            types={trick.types ?? []}
-          />
-        ))
-      }
+      <div class='flex gap-4 flex-col'>
+        {
+          prerequisites?.map((trick) => (
+            <TrickCard
+              preview={trick.preview}
+              id={trick.id}
+              name={trick.name}
+              types={trick.types ?? []}
+            />
+          ))
+        }
+      </div>
     </div>
   </main>
 </Layout>
