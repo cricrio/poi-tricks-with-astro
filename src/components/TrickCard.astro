@@ -4,20 +4,26 @@ import SelectCategory from './SelectCategory';
 interface Props {
   id: string;
   name: string;
+  preview: string | null;
   types: string[];
 }
 
-const { name, id, types } = Astro.props;
+const { name, id, preview, types } = Astro.props;
 ---
 
 <div class='card card-compact bg-base-100 shadow-xl border border-base-content'>
   <figure>
     <a href={`/tricks/${id}`} class='flex-1'>
-      <PreviewImage
-        trickId={id}
-        name={name}
-        className='w-full max-w-2xl aspect-video'
-      />
+      {
+        //quick fix add a default image if no image
+        preview && (
+          <PreviewImage
+            src={preview}
+            name={name}
+            className='w-full max-w-2xl aspect-video'
+          />
+        )
+      }
     </a>
   </figure>
   <div class='card-body'>

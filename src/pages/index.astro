@@ -53,6 +53,7 @@ const trickIds = data.flatMap(({ data }) => data).map((trick) => trick.id);
             <div class='grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-10'>
               {tricks?.map((trick) => (
                 <TrickCard
+                  preview={trick.preview}
                   id={trick.id}
                   name={trick.name}
                   types={trick.types ?? []}

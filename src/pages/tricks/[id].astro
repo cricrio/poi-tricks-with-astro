@@ -1,5 +1,4 @@
 ---
-import LoadCollection from '@/components/LoadCollection';
 import SelectCategory from '@/components/SelectCategory';
 import TrickCard from '@/components/TrickCard.astro';
 import Layout from '@/layouts/Layout.astro';
@@ -10,7 +9,6 @@ export async function getStaticPaths() {
   const supabase = serverClient();
   const trickProvider = new TrickProvider(supabase);
   const { data: tricks } = await trickProvider.getTricks({}); // TODO: fix type, should work with no args
-
   return tricks?.map((trick) => ({
     params: { id: trick.id },
     props: { trick },
@@ -90,6 +88,7 @@ const { data: prerequisites } = await trickProvider.getTricks({
       {
         prerequisites?.map((trick) => (
           <TrickCard
+            preview={trick.preview}
             id={trick.id}
             name={trick.name}
             types={trick.types ?? []}

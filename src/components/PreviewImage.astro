@@ -2,13 +2,14 @@
 import { Image } from 'astro:assets';
 
 interface Props {
-  trickId: string;
+  src: string;
   name: string;
   className: string;
 }
 
-const { trickId, name, className } = Astro.props;
-const previewUrl = `https://kmgyjzhtpelimdsqmkbt.supabase.co/storage/v1/object/public/preview/${trickId}.webp`;
+const { src, name, className } = Astro.props;
+//TODO: use config
+const previewUrl = `https://kmgyjzhtpelimdsqmkbt.supabase.co/storage/v1/object/public/preview/${src}`;
 const previewAlt = `Preview of ${name}`;
 ---
 
