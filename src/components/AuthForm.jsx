@@ -1,7 +1,9 @@
 import { createComponentClient } from '@/supabase';
-
+import AuthProvider from '@/modules/auth/provider';
 const AuthForm = () => {
   const supabaseClient = createComponentClient();
+  const authProvider = new AuthProvider(supabaseClient);
+
   const login = async (e) => {
     e.preventDefault();
 

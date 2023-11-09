@@ -1,3 +1,4 @@
+import { redirectUrl } from '@/config';
 import { type Client } from '@/supabase';
 
 class AuthProvider {
@@ -5,6 +6,15 @@ class AuthProvider {
   constructor(supabase: Client) {
     this.supabase = supabase;
   }
+
+  login = (email: string) => {
+    return this.supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: redirectUrl,
+      },
+    });
+  };
 
   onAuthChange = (callback: (userId?: string) => void) => {
     this.supabase.auth.getSession().then(({ data: { session }, error }) => {
