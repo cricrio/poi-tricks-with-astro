@@ -1,6 +1,6 @@
 import { updateCollection, useCollections } from '@/modules/collections/';
 
-const SelectCategory = ({ trickId }) => {
+const SaveInCollectionButton = ({ trickId }) => {
   const collection = useCollections(trickId);
   return (
     <button
@@ -19,4 +19,4 @@ const SelectCategory = ({ trickId }) => {
   );
 };
 
-export default SelectCategory;
+export default SaveInCollectionButton;

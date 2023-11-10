@@ -1,4 +1,4 @@
-import { createComponentClient } from '@/supabase';
+import { createComponentClient } from '@/modules/supabase';
 import { updateCollectionStore, setCollectionId } from './store';
 import CollectionProvider from './provider';
 import { getCurrentUserId } from '../user/store';

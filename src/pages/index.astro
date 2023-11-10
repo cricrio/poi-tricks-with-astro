@@ -1,9 +1,9 @@
 ---
-import Main from '@/components/Main.astro';
-import TrickCard from '@/components/TrickCard.astro';
-import Layout from '@/layouts/Layout.astro';
+import Main from '@/modules/layouts/components/Main.astro';
+import TrickCard from '@/modules/tricks/components/TrickCard.astro';
+import Layout from '@/modules/layouts/components/Layout.astro';
 import { difficultyLevels } from '@/config';
-import { serverClient } from '@/supabase';
+import { serverClient } from '@/modules/supabase';
 import TrickProvider from '@/modules/tricks/provider';
 
 const supabase = serverClient();
@@ -73,7 +73,7 @@ const trickIds = data.flatMap(({ data }) => data).map((trick) => trick.id);
   import { getTrickIdsFromMain } from '@/modules/tricks/utils';
   import { setCollections } from '@/modules/collections/store';
   import { setCurrentUserId, onUserChange } from '@/modules/user/store';
-  import { createComponentClient } from '@/supabase';
+  import { createComponentClient } from '@/modules/supabase';
 
   const supabase = createComponentClient();
   const authProvider = new AuthProvider(supabase);

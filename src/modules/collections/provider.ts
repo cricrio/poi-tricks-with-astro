@@ -1,4 +1,4 @@
-import { type Client } from '@/supabase';
+import { type Client } from '@/modules/supabase';
 
 class CollectionProvider {
   supabase: Client;

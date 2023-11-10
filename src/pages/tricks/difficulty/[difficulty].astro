@@ -1,10 +1,10 @@
 ---
-import Main from '@/components/Main.astro';
-import TrickCard from '@/components/TrickCard.astro';
+import Main from '@/modules/layouts/components/Main.astro';
+import TrickCard from '@/modules/tricks/components/TrickCard.astro';
 import { difficultyLevels } from '@/config';
 import Layout from '@/layouts/Layout.astro';
 import TrickProvider from '@/modules/tricks/provider';
-import { serverClient } from '@/supabase';
+import { serverClient } from '@/modules/supabase';
 
 export async function getStaticPaths() {
   return difficultyLevels.map((difficulty: string) => ({
@@ -50,7 +50,7 @@ const { data: tricks } = await trickProvider.getTricks({
   import { getTrickIdsFromMain } from '@/modules/tricks/utils';
   import { setCollections } from '@/modules/collections/store';
   import { setCurrentUserId, onUserChange } from '@/modules/user/store';
-  import { createComponentClient } from '@/supabase';
+  import { createComponentClient } from '@/modules/supabase';
 
   const supabase = createComponentClient();
   const authProvider = new AuthProvider(supabase);

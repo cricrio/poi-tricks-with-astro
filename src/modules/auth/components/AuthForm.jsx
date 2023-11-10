@@ -1,4 +1,4 @@
-import { createComponentClient } from '@/supabase';
+import { createComponentClient } from '@/modules/supabase';
 import AuthProvider from '@/modules/auth/provider';
 const AuthForm = () => {
   const supabaseClient = createComponentClient();
@@ -10,9 +10,7 @@ const AuthForm = () => {
     const form = e.target;
     const formData = new FormData(form);
 
-    const { error } = await supabaseClient.auth.signInWithOtp({
-      email: formData.get('email'),
-    });
+    const { error } = await authProvider.login(formData.get('email'));
   };
 
   return (

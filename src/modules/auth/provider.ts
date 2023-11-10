@@ -1,5 +1,5 @@
 import { redirectUrl } from '@/config';
-import { type Client } from '@/supabase';
+import { type Client } from '@/modules/supabase';
 
 class AuthProvider {
   supabase: Client;
