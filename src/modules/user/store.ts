@@ -9,11 +9,10 @@ export const getCurrentUserId = () => {
   return userStore.get();
 };
 
-export const useCurrentUserId = userStore.useStore;
+export const useCurrentUserId = userStore.useStore.bind(userStore);
 
 export const onUserChange = (
   callback: (value: { userId?: string }) => void
 ) => {
-  console.log(userStore);
   userStore.subscribe(callback);
 };
