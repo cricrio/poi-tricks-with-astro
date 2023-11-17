@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { deleteCookie, getCookie, setCookie } from './cookie';
 
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
@@ -16,16 +18,46 @@ export const serverClient = () =>
 export type Client = ReturnType<typeof createClient<Database>>;
 let clientClient: Client;
 
+const customStorageAdapter = {
+  getItem: (key: string) => {
+    return getCookie(key);
+  },
+  setItem: (key: string, value: string) => {
+    setCookie(key, value);
+  },
+  removeItem: (key: string) => {
+    deleteCookie(key);
+  },
+};
+
 export const createComponentClient = () => {
   if (!clientClient) {
     clientClient = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       auth: {
-        storage: sessionStorage,
+        detectSessionInUrl: true,
+        flowType: 'pkce',
+        storage: customStorageAdapter,
       },
     });
   }
   return clientClient;
 };
+
+const k = 'my-access-token';
+export const createSSRClient = (Astro: any) =>
+  createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      get(key: string) {
+        return Astro.cookies.get(key)?.value;
+      },
+      set(key: string, value: string, options: CookieOptions) {
+        Astro.cookies.set(key, value, options);
+      },
+      remove(key: string, options) {
+        Astro.cookies.delete(key, options);
+      },
+    },
+  });
 
 // export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
 //   auth: {

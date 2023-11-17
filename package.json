@@ -18,6 +18,7 @@
     "@astrojs/vercel": "^5.2.0",
     "@nanostores/query": "^0.2.4",
     "@nanostores/react": "^0.7.1",
+    "@supabase/ssr": "^0.0.10",
     "@supabase/supabase-js": "^2.33.2",
     "@tailwindcss/container-queries": "^0.1.1",
     "@types/react": "^18.2.21",

@@ -8,7 +8,11 @@ import {
   listenKeys,
 } from 'nanostores';
 
-type MapStore = { userId?: string; collections?: any[] };
+type MapStore = {
+  userId?: string;
+  collections?: any[];
+  userCollections?: any[];
+};
 
 export const $store = deepMap<MapStore>({});
 

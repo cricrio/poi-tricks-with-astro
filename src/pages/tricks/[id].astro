@@ -1,7 +1,7 @@
 ---
 import SelectCategory from '@/modules/collections/components/SaveInCollectionButton';
 import TrickCard from '@/modules/tricks/components/TrickCard.astro';
-import Layout from '@/layouts/Layout.astro';
+import Layout from '@/modules/layouts/components/Layout.astro';
 import { serverClient } from '@/modules/supabase';
 import TrickProvider from '@/modules/tricks/provider';
 
@@ -107,13 +107,12 @@ const { data: prerequisites } = await trickProvider.getTricks({
   import AuthProvider from '@/modules/auth/provider';
   import CollectionProvider from '@/modules/collections/provider';
   import { getTrickIdsFromMain } from '@/modules/tricks/utils';
-  import { setCollections } from '@/modules/collections/store';
+  import { setCollections } from '@/modules/collections/stores/collections';
   import { setCurrentUserId, onUserChange } from '@/modules/user/store';
   import { createComponentClient } from '@/modules/supabase';
 
   const supabase = createComponentClient();
   const authProvider = new AuthProvider(supabase);
-  const collectionProvider = new CollectionProvider(supabase);
 
   const trickIds = getTrickIdsFromMain();
 
@@ -121,12 +120,9 @@ const { data: prerequisites } = await trickProvider.getTricks({
 
   onUserChange(async ({ userId }) => {
     if (userId) {
-      const collections = await collectionProvider.getCollections({
-        userId,
-        trickIds,
-      });
+      const collectionProvider = new CollectionProvider(supabase, userId);
+      const collections = await collectionProvider.getCollections(trickIds);
       setCollections(collections);
     }
   });
 </script>
- @/components/SaveInCollectionButton@/modules/supabase

@@ -57,6 +57,19 @@ class CollectionProvider {
     }
     return { id: data?.id };
   };
+
+  getUserCollections = async () => {
+    const { data, error } = await this.supabase
+      .from('collections')
+      .select('id, trick_id (*)')
+      .eq('user_id', this.userId);
+
+    if (error) {
+      console.error(error);
+    }
+
+    return data ? data.map(({ trick_id }) => trick_id) : [];
+  };
 }
 
 export default CollectionProvider;

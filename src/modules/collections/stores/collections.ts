@@ -1,5 +1,5 @@
-import type { UpdateCollectionAction } from './types';
-import { $store, StoreHandler } from '../store';
+import type { UpdateCollectionAction } from '../types';
+import { $store, StoreHandler } from '../../store';
 
 const collectionStore = new StoreHandler($store, 'collections');
 

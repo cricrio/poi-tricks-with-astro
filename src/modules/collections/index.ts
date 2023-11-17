@@ -1,10 +1,10 @@
 import { createComponentClient } from '@/modules/supabase';
-import { updateCollectionStore, setCollectionId } from './store';
+import { updateCollectionStore, setCollectionId } from './stores/collections';
 import CollectionProvider from './provider';
 import { getCurrentUserId } from '../user/store';
 import type { UpdateCollectionAction } from './types';
 
-export { useCollections } from './store';
+export { useCollections } from './stores/collections';
 
 export const updateCollection = async (action: UpdateCollectionAction) => {
   const supabase = createComponentClient();
@@ -19,9 +19,7 @@ export const updateCollection = async (action: UpdateCollectionAction) => {
       trickId: action.trickId,
       category: action.category,
     });
-    console.log('id', id);
     setCollectionId({ id, action });
-    console.log('new id set');
   } else if (action.type === 'remove') {
     collectionProvider.removeById(action.id);
   }

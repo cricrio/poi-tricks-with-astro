@@ -19,7 +19,10 @@ const data = await Promise.all(
   )
 );
 
-const trickIds = data.flatMap(({ data }) => data).map((trick) => trick.id);
+const trickIds =
+  data && data.length
+    ? data.flatMap(({ data }) => data).map((trick) => trick.id)
+    : [];
 ---
 
 <Layout title='PoiTricks'>
@@ -27,7 +30,6 @@ const trickIds = data.flatMap(({ data }) => data).map((trick) => trick.id);
     class='mx-auto max-w-7xl w-full min-h-full p-4 md:p-8 lg:p-10'
     data-trickids={trickIds}
   >
-    <!-- <LoadCollection trickIds={data.flat().map(({ id }) => id)} client:only /> -->
     {
       difficultyLevels.map((difficulty, index) => {
         const { data: tricks, count } = data[index];
@@ -71,7 +73,7 @@ const trickIds = data.flatMap(({ data }) => data).map((trick) => trick.id);
   import AuthProvider from '@/modules/auth/provider';
   import CollectionProvider from '@/modules/collections/provider';
   import { getTrickIdsFromMain } from '@/modules/tricks/utils';
-  import { setCollections } from '@/modules/collections/store';
+  import { setCollections } from '@/modules/collections/stores/collections';
   import { setCurrentUserId, onUserChange } from '@/modules/user/store';
   import { createComponentClient } from '@/modules/supabase';
 

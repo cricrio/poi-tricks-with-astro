@@ -37,7 +37,7 @@ const { name, id, preview, types } = Astro.props;
         types &&
           types.length > 0 &&
           types.map((type) => (
-            <div class='badge badge-secondary  p-3'>{type}</div>
+            <div class='badge badge-secondary p-3'>{type}</div>
           ))
       }
       <SelectCategory client:only trickId={id} />

@@ -1,40 +1,35 @@
 ---
-import Main from '@/modules/layouts/components/Main.astro';
-import TrickCard from '@/modules/tricks/components/TrickCard.astro';
-import { difficultyLevels } from '@/config';
+import CollectionProvider from '@/modules/collections/provider';
 import Layout from '@/modules/layouts/components/Layout.astro';
-import TrickProvider from '@/modules/tricks/provider';
-import { serverClient } from '@/modules/supabase';
+import TrickCard from '@/modules/tricks/components/TrickCard.astro';
 
-export async function getStaticPaths() {
-  return difficultyLevels.map((difficulty: string) => ({
-    params: {
-      difficulty,
-    },
-  }));
-}
+import { createSSRClient } from '@/modules/supabase';
 
-const supabase = serverClient();
-const trickProvider = new TrickProvider(supabase);
+const supabase = createSSRClient(Astro);
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 
-const { difficulty } = Astro.params;
-const { data: tricks } = await trickProvider.getTricks({
-  filter: { eq: { key: 'difficulty', value: difficulty as string } }, // TODO Type: is as string really needed ?
-});
+const collectionProvider = new CollectionProvider(supabase, user?.id);
+const userTricks = await collectionProvider.getUserCollections();
+const trickIds = userTricks.map((t) => t.id);
+
+export const prerender = false;
 ---
 
-<Layout title={`${difficulty} tricks`}>
+<Layout title='My Collection'>
   <main
     class='mx-auto max-w-7xl w-full min-h-full p-4 md:p-8 lg:p-10'
-    data-tricks={tricks?.map((trick) => trick.id)}
+    data-trickids={trickIds}
   >
-    <h1 class='text-3xl mb-6 capitalize'>{difficulty} tricks</h1>
+    <h1 class='text-3xl mb-6 capitalize'>Saved tricks ({userTricks.length})</h1>
+
     <div class='grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-10'>
       {
-        tricks?.map((trick) => (
+        userTricks?.map((trick) => (
           <TrickCard
-            id={trick.id}
             preview={trick.preview}
+            id={trick.id}
             name={trick.name}
             types={trick.types ?? []}
           />
@@ -43,23 +38,22 @@ const { data: tricks } = await trickProvider.getTricks({
     </div>
   </main>
 </Layout>
-
 <script>
   import AuthProvider from '@/modules/auth/provider';
   import CollectionProvider from '@/modules/collections/provider';
   import { getTrickIdsFromMain } from '@/modules/tricks/utils';
-  import { setCollections } from '@/modules/collections/stores/collections';
   import { setCurrentUserId, onUserChange } from '@/modules/user/store';
   import { createComponentClient } from '@/modules/supabase';
+  import { setCollections } from '@/modules/collections/stores/collections';
 
   const supabase = createComponentClient();
   const authProvider = new AuthProvider(supabase);
 
-  const trickIds = getTrickIdsFromMain();
-
   authProvider.onAuthChange(setCurrentUserId);
 
-  onUserChange(async (userId) => {
+  const trickIds = getTrickIdsFromMain();
+
+  onUserChange(async ({ userId }) => {
     if (userId) {
       const collectionProvider = new CollectionProvider(supabase, userId);
       const collections = await collectionProvider.getCollections(trickIds);

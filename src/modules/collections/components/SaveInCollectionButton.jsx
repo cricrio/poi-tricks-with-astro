@@ -4,7 +4,9 @@ const SaveInCollectionButton = ({ trickId }) => {
   const collection = useCollections(trickId);
   return (
     <button
-      className='badge badge-secondary'
+      className={`badge badge-accent p-3 ${
+        collection?.category ? '' : 'badge-outline'
+      }`}
       onClick={() =>
         updateCollection({
           trickId,
@@ -14,7 +16,7 @@ const SaveInCollectionButton = ({ trickId }) => {
         })
       }
     >
-      {collection?.category || 'enregistrer'}
+      {collection?.category || 'save'}
     </button>
   );
 };
