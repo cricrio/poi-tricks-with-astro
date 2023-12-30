@@ -1,15 +1,18 @@
 ---
 import PreviewImage from './PreviewImage.astro';
 import SelectCategory from '../../collections/components/SaveInCollectionButton';
+import AvatarGroup from '../../creators/components/AvatarGroup.astro';
+import Avatar from '../../creators/components/Avatar.astro';
 
 interface Props {
   id: string;
   name: string;
   preview: string | null;
   types: string[];
+  creators?: Array<{ name: string; picture: string | null; id: string }>;
 }
 
-const { name, id, preview, types } = Astro.props;
+const { name, id, preview, types, creators } = Astro.props;
 ---
 
 <div class='card card-compact bg-base-100 shadow-xl border border-base-content'>
@@ -28,10 +31,29 @@ const { name, id, preview, types } = Astro.props;
     </a>
   </figure>
   <div class='card-body'>
+    <div class='flex items-center gap-4'>
+      <AvatarGroup>
+        {
+          creators?.map((creator) => (
+            <Avatar src={creator.picture} name={creator.name} width='w-8' />
+          ))
+        }
+      </AvatarGroup>
+      <div>
+        {
+          creators?.map((creator, index) => (
+            <>
+              <a href={`/creators/${creator.id}`}>{creator.name}</a>
+              {index < creators.length - 1 && <span class='-ml-1'>,</span>}
+            </>
+          ))
+        }
+      </div>
+    </div>
     <a href={`/tricks/${id}`}>
       <h2 class='card-title'>{name}</h2>
-      <!-- <SelectCategory client:only trickId={id} /> -->
     </a>
+
     <div class='flex gap-2 flex-wrap'>
       {
         types &&

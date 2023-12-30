@@ -1,18 +1,21 @@
 ---
-import Main from '@/modules/layouts/components/Main.astro';
 import TrickCard from '@/modules/tricks/components/TrickCard.astro';
 import Layout from '@/modules/layouts/components/Layout.astro';
+import Header from '@/modules/layouts/components/Header.astro';
 import { difficultyLevels } from '@/config';
-import { serverClient } from '@/modules/supabase';
 import TrickProvider from '@/modules/tricks/provider';
+import Avatar from '@/modules/creators/components/Avatar.astro';
+import CreatorProvider from '@/modules/creators/provider';
+import CollectionHandler from '@/modules/collections/components/CollectionHandler.astro';
 
-const supabase = serverClient();
-const trickProvider = new TrickProvider(supabase);
+const trickProvider = new TrickProvider();
+const creatorProvider = new CreatorProvider();
 
 const data = await Promise.all(
   difficultyLevels.map((difficulty) =>
     trickProvider.getTricks({
       filter: { eq: { key: 'difficulty', value: difficulty } },
+      edges: { creators: true },
       limit: 6,
       count: true,
     })
@@ -21,37 +24,56 @@ const data = await Promise.all(
 
 const trickIds =
   data && data.length
-    ? data.flatMap(({ data }) => data).map((trick) => trick.id)
+    ? data
+        .flatMap(({ data }) => data)
+        .map((trick) => trick?.id ?? '')
+        .filter(Boolean)
     : [];
+
+const { data: creatorList, count: creatorCount } =
+  await creatorProvider.getCreators({
+    limit: 10,
+    count: true,
+  });
 ---
 
 <Layout title='PoiTricks'>
-  <main
-    class='mx-auto max-w-7xl w-full min-h-full p-4 md:p-8 lg:p-10'
-    data-trickids={trickIds}
-  >
+  <CollectionHandler trickIds={trickIds} />
+  <main class='mx-auto max-w-7xl w-full min-h-full p-4 md:p-8 lg:p-10'>
+    <section>
+      <Header href='/creators'>
+        Featuring ({creatorCount})
+      </Header>
+      <div
+        class='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'
+      >
+        {
+          creatorList?.map((creator) => (
+            <div class='flex justify-space-between flex-col items-center gap-2'>
+              <Avatar
+                name={creator.name ?? ''}
+                src={creator.picture}
+                width='w-36'
+              />
+              <a
+                class='text-xl justify-self-end capitalize text-center max-w-44'
+                href={`/creators/${creator.id}`}
+              >
+                {creator.name}
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </section>
     {
       difficultyLevels.map((difficulty, index) => {
         const { data: tricks, count } = data[index];
         return (
-          <section class='mb-16'>
-            <header class='flex justify-between items-center mb-4'>
-              <a
-                class='border-transparent border-b hover:border-primary-content pb-1'
-                href={`/tricks/difficulty/${difficulty}`}
-              >
-                <h2 class='text-2xl font-bold capitalize'>
-                  {difficulty} ({count})
-                </h2>
-              </a>
-              <a
-                class='uppercase border-transparent border-b hover:border-primary-content pb-1'
-                href={`/tricks/difficulty/${difficulty}`}
-              >
-                See all
-              </a>
-            </header>
-
+          <section class='my-16'>
+            <Header href={`/tricks/difficulty/${difficulty}`}>
+              {difficulty} ({count})
+            </Header>
             <div class='grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-10'>
               {tricks?.map((trick) => (
                 <TrickCard
@@ -59,6 +81,7 @@ const trickIds =
                   id={trick.id}
                   name={trick.name}
                   types={trick.types ?? []}
+                  creators={trick.creators ?? []}
                 />
               ))}
             </div>
@@ -68,27 +91,3 @@ const trickIds =
     }
   </main>
 </Layout>
-
-<script>
-  import AuthProvider from '@/modules/auth/provider';
-  import CollectionProvider from '@/modules/collections/provider';
-  import { getTrickIdsFromMain } from '@/modules/tricks/utils';
-  import { setCollections } from '@/modules/collections/stores/collections';
-  import { setCurrentUserId, onUserChange } from '@/modules/user/store';
-  import { createComponentClient } from '@/modules/supabase';
-
-  const supabase = createComponentClient();
-  const authProvider = new AuthProvider(supabase);
-
-  const trickIds = getTrickIdsFromMain();
-
-  authProvider.onAuthChange(setCurrentUserId);
-
-  onUserChange(async ({ userId }) => {
-    if (userId) {
-      const collectionProvider = new CollectionProvider(supabase, userId);
-      const collections = await collectionProvider.getCollections(trickIds);
-      setCollections(collections);
-    }
-  });
-</script>

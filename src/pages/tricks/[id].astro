@@ -2,39 +2,51 @@
 import SelectCategory from '@/modules/collections/components/SaveInCollectionButton';
 import TrickCard from '@/modules/tricks/components/TrickCard.astro';
 import Layout from '@/modules/layouts/components/Layout.astro';
-import { serverClient } from '@/modules/supabase';
 import TrickProvider from '@/modules/tricks/provider';
+import AvatarGroup from '@/modules/creators/components/AvatarGroup.astro';
+import Avatar from '@/modules/creators/components/Avatar.astro';
+import CollectionHandler from '@/modules/collections/components/CollectionHandler.astro';
 
 export async function getStaticPaths() {
-  const supabase = serverClient();
-  const trickProvider = new TrickProvider(supabase);
-  const { data: tricks } = await trickProvider.getTricks({}); // TODO: fix type, should work with no args
+  const trickProvider = new TrickProvider();
+
+  const { data: tricks } = await trickProvider.getTricks({
+    edges: { creators: true, videos: true },
+  });
+
   return tricks?.map((trick) => ({
     params: { id: trick.id },
     props: { trick },
   }));
 }
 
-const supabase = serverClient();
-
 const { trick } = Astro.props;
 
-const trickProvider = new TrickProvider(supabase);
-
-const videos = await trickProvider.getTrickVideos(trick.id);
+const trickProvider = new TrickProvider();
 
 const { data: prerequisites } = await trickProvider.getTricks({
   filter: { in: { key: 'id', values: trick.prerequisites } },
+  edges: { creators: true },
 });
 ---
 
 <Layout title={trick.name}>
-  <main
-    class='grid grid-cols-1 lg:grid-cols-[3fr_1fr] p-4 md:p-8 lg:p-10'
-    data-trickIds={[trick.id]}
-  >
+  <CollectionHandler trickIds={[trick.id]} />
+  <main class='grid grid-cols-1 lg:grid-cols-[3fr_1fr] p-4 md:p-8 lg:p-10'>
     <div class='@md:ml-52'>
-      <h1 class='text-3xl mb-6'>{trick.name}</h1>
+      <h1 class='text-3xl mb-4'>{trick.name}</h1>
+      <div class='flex items-center gap-4 mb-4'>
+        <AvatarGroup>
+          {
+            trick.creators?.map((creator) => (
+              <Avatar src={creator.picture} name={creator.name} width='w-8' />
+            ))
+          }
+        </AvatarGroup>
+        <div>
+          {trick.creators?.map((creator) => creator.name).join(', ')}
+        </div>
+      </div>
       <div class='flex gap-2 flex-wrap mb-6 lg:mb-10'>
         <a
           class='badge badge-primary capitalize p-3'
@@ -64,9 +76,9 @@ const { data: prerequisites } = await trickProvider.getTricks({
           }
         </div>
       </div>
-      <div class='flex gap-4 flex-col'>
+      <div class='flex gap-2 flex-col'>
         {
-          videos?.map((v) =>
+          trick.videos?.map((v) =>
             v.source === 'youtube' ? (
               <div class='relative'>
                 <iframe
@@ -95,6 +107,7 @@ const { data: prerequisites } = await trickProvider.getTricks({
               id={trick.id}
               name={trick.name}
               types={trick.types ?? []}
+              creators={trick.creators ?? []}
             />
           ))
         }
@@ -102,27 +115,3 @@ const { data: prerequisites } = await trickProvider.getTricks({
     </div>
   </main>
 </Layout>
-
-<script>
-  import AuthProvider from '@/modules/auth/provider';
-  import CollectionProvider from '@/modules/collections/provider';
-  import { getTrickIdsFromMain } from '@/modules/tricks/utils';
-  import { setCollections } from '@/modules/collections/stores/collections';
-  import { setCurrentUserId, onUserChange } from '@/modules/user/store';
-  import { createComponentClient } from '@/modules/supabase';
-
-  const supabase = createComponentClient();
-  const authProvider = new AuthProvider(supabase);
-
-  const trickIds = getTrickIdsFromMain();
-
-  authProvider.onAuthChange(setCurrentUserId);
-
-  onUserChange(async ({ userId }) => {
-    if (userId) {
-      const collectionProvider = new CollectionProvider(supabase, userId);
-      const collections = await collectionProvider.getCollections(trickIds);
-      setCollections(collections);
-    }
-  });
-</script>

@@ -16,6 +16,7 @@ export const serverClient = () =>
   });
 
 export type Client = ReturnType<typeof createClient<Database>>;
+
 let clientClient: Client;
 
 const customStorageAdapter = {
@@ -43,7 +44,6 @@ export const createComponentClient = () => {
   return clientClient;
 };
 
-const k = 'my-access-token';
 export const createSSRClient = (Astro: any) =>
   createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
@@ -59,8 +59,17 @@ export const createSSRClient = (Astro: any) =>
     },
   });
 
-// export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
-//   auth: {
-//     storage: sessionStorage,
-//   },
-// });
+export const getClient = (Astro: any): Client => {
+  try {
+    if (Astro) {
+      return createSSRClient(Astro);
+    }
+    if (window) {
+      return createComponentClient();
+    }
+  } catch (e) {
+    // accessing to window in server throw a error. We can ignore it and return the server client.
+    return serverClient();
+  }
+  return serverClient();
+};

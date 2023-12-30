@@ -1,0 +1,13 @@
+---
+interface Props {
+  src: string;
+  name: string;
+  width?: string;
+}
+
+const { src, name, width = 'w-12'} = Astro.props;
+---
+
+<div class={width}>
+  <img class='rounded-full' src={src} alt={name} />
+</div>

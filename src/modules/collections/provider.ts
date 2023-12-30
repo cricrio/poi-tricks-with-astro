@@ -1,10 +1,9 @@
-import { type Client } from '@/modules/supabase';
+import SupabaseProvider from '../supabase/provider';
 
-class CollectionProvider {
-  supabase: Client;
+export default class CollectionProvider extends SupabaseProvider {
   userId: string;
-  constructor(supabase: Client, userId: string) {
-    this.supabase = supabase;
+  constructor(userId: string, Astro?: any) {
+    super(Astro);
     this.userId = userId;
   }
 
@@ -71,5 +70,3 @@ class CollectionProvider {
     return data ? data.map(({ trick_id }) => trick_id) : [];
   };
 }
-
-export default CollectionProvider;

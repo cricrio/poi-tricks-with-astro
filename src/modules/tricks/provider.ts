@@ -1,27 +1,46 @@
-import type { Client } from '@/modules/supabase';
+import SupabaseProvider from '../supabase/provider';
 
-class TrickProvider {
-  supabase: Client;
-
-  constructor(supabase: Client) {
-    this.supabase = supabase;
-  }
-
+class TrickProvider extends SupabaseProvider {
   getTricks = async ({
     filter,
     limit,
     count,
+    edges,
   }: {
     filter?: {
       eq?: { key: string; value: string };
       in?: { key: string; values: string[] };
     };
+    edges?: {
+      creators?: boolean;
+      videos?: boolean;
+    };
     limit?: number;
     count?: boolean;
-  }) => {
-    let query = this.supabase
-      .from('tricks')
-      .select('*', count ? { count: 'exact' } : undefined); // Not sure if this is correct. We don't use everything everywhere. Maybe two view, one for the card and one the detail page
+  } = {}) => {
+    const from = this.supabase.from('tricks');
+
+    let query = (() => {
+      if (edges?.creators && edges?.videos) {
+        return from.select(
+          '*, creators(name, picture), videos(source, externalId)',
+          count ? { count: 'exact' } : undefined
+        );
+      }
+      if (edges?.creators) {
+        return from.select(
+          '*, creators(name, picture)',
+          count ? { count: 'exact' } : undefined
+        );
+      }
+      if (edges?.videos) {
+        return from.select(
+          '*, videos(source, externalId)',
+          count ? { count: 'exact' } : undefined
+        );
+      }
+      return from.select('*', count ? { count: 'exact' } : undefined);
+    })();
 
     if (filter?.eq) {
       query = query.eq(filter.eq.key, filter.eq.value);
@@ -32,22 +51,13 @@ class TrickProvider {
     if (limit) {
       query.limit(limit);
     }
+
     const { data, count: trickCount, error } = await query;
     if (error) {
       console.error(error);
     }
-    return { data, count: trickCount };
-  };
 
-  getTrickVideos = async (trickId: string) => {
-    const { data, error } = await this.supabase
-      .from('videos')
-      .select('id, source, externalId')
-      .eq('trickId', trickId);
-    if (error) {
-      console.error(error);
-    }
-    return data;
+    return { data, count: trickCount };
   };
 }
 

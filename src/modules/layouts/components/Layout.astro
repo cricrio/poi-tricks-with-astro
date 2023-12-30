@@ -60,3 +60,14 @@ const { title } = Astro.props;
     </div>
   </body>
 </html>
+
+<script>
+  import AuthProvider from '@/modules/auth/provider';
+  import { setCurrentUserId } from '@/modules/user/store';
+  import { createComponentClient } from '@/modules/supabase';
+
+  const supabase = createComponentClient();
+  const authProvider = new AuthProvider(supabase);
+
+  authProvider.onAuthChange(setCurrentUserId);
+</script>

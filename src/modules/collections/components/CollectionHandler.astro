@@ -1,0 +1,25 @@
+---
+interface Props {
+  trickIds: string[];
+}
+const { trickIds } = Astro.props;
+---
+
+<div id='trick-data' data-trickids={trickIds}></div>
+
+<script>
+  import CollectionProvider from '@/modules/collections/provider';
+  import { setCollections } from '@/modules/collections/stores/collections';
+  import { onUserChange } from '@/modules/user/store';
+
+  const trickIds =
+    document.getElementById('trick-data')?.dataset?.trickids?.split(',') ?? [];
+
+  onUserChange(async ({ userId }) => {
+    if (userId) {
+      const collectionProvider = new CollectionProvider(userId);
+      const collections = await collectionProvider.getCollections(trickIds);
+      setCollections(collections);
+    }
+  });
+</script>

@@ -1,0 +1,53 @@
+---
+import Layout from '@/modules/layouts/components/Layout.astro';
+import CreatorProvider from '@/modules/creators/provider';
+import Avatar from '@/modules/creators/components/Avatar.astro';
+import TrickCard from '@/modules/tricks/components/TrickCard.astro';
+import CollectionHandler from '@/modules/collections/components/CollectionHandler.astro';
+
+type Creator = {
+  id: string;
+  name?: string;
+  picture?: string;
+};
+
+export async function getStaticPaths() {
+  const creatorProvider = new CreatorProvider();
+  const { data: creators } = await creatorProvider.getCreators();
+  return creators?.map((creator) => ({
+    params: { id: creator.id },
+    props: { creator },
+  }));
+}
+
+interface Props {
+  creator: Creator;
+}
+
+const { creator } = Astro.props;
+const creatorProvider = new CreatorProvider();
+const tricks = await creatorProvider.getTricksByCreator(creator.id);
+---
+
+<Layout title={creator.name || ''}>
+  <CollectionHandler trickIds={tricks?.map((trick) => trick.id) ?? []} />
+  <main class='mx-auto max-w-7xl w-full min-h-full p-4 md:p-8 lg:p-10'>
+    <div class='flex flex-col items-center mb-8'>
+      <Avatar name={creator.name} src={creator.picture} width='w-36' />
+      <h1 class='text-3xl my-2 capitalize'>{creator.name}</h1>
+    </div>
+    <div class='grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-10'>
+      {
+        tricks?.map((trick) => (
+          <TrickCard
+            preview={trick.preview}
+            id={trick.id}
+            name={trick.name}
+            types={trick.types ?? []}
+            creators={trick.creators ?? []}
+          />
+        ))
+      }
+    </div>
+  </main>
+</Layout>
