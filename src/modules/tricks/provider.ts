@@ -29,7 +29,7 @@ class TrickProvider extends SupabaseProvider {
       }
       if (edges?.creators) {
         return from.select(
-          '*, creators(name, picture)',
+          '*, creators(id, name, picture)',
           count ? { count: 'exact' } : undefined
         );
       }
