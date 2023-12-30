@@ -2,6 +2,7 @@
 import CollectionProvider from '@/modules/collections/provider';
 import Layout from '@/modules/layouts/components/Layout.astro';
 import TrickCard from '@/modules/tricks/components/TrickCard.astro';
+import CollectionHandler from '@/modules/collections/components/CollectionHandler.astro';
 
 import { createSSRClient } from '@/modules/supabase';
 
@@ -10,7 +11,7 @@ const {
   data: { user },
 } = await supabase.auth.getUser();
 
-const collectionProvider = new CollectionProvider(supabase, user?.id);
+const collectionProvider = new CollectionProvider(user?.id);
 const userTricks = await collectionProvider.getUserCollections();
 const trickIds = userTricks.map((t) => t.id);
 
@@ -18,10 +19,8 @@ export const prerender = false;
 ---
 
 <Layout title='My Collection'>
-  <main
-    class='mx-auto max-w-7xl w-full min-h-full p-4 md:p-8 lg:p-10'
-    data-trickids={trickIds}
-  >
+  <CollectionHandler trickIds={trickIds} />
+  <main class='mx-auto max-w-7xl w-full min-h-full p-4 md:p-8 lg:p-10'>
     <h1 class='text-3xl mb-6 capitalize'>Saved tricks ({userTricks.length})</h1>
 
     <div class='grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-10'>
@@ -32,32 +31,10 @@ export const prerender = false;
             id={trick.id}
             name={trick.name}
             types={trick.types ?? []}
+            creators={trick.creators ?? []}
           />
         ))
       }
     </div>
   </main>
 </Layout>
-<script>
-  import AuthProvider from '@/modules/auth/provider';
-  import CollectionProvider from '@/modules/collections/provider';
-  import { getTrickIdsFromMain } from '@/modules/tricks/utils';
-  import { setCurrentUserId, onUserChange } from '@/modules/user/store';
-  import { createComponentClient } from '@/modules/supabase';
-  import { setCollections } from '@/modules/collections/stores/collections';
-
-  const supabase = createComponentClient();
-  const authProvider = new AuthProvider(supabase);
-
-  authProvider.onAuthChange(setCurrentUserId);
-
-  const trickIds = getTrickIdsFromMain();
-
-  onUserChange(async ({ userId }) => {
-    if (userId) {
-      const collectionProvider = new CollectionProvider(supabase, userId);
-      const collections = await collectionProvider.getCollections(trickIds);
-      setCollections(collections);
-    }
-  });
-</script>

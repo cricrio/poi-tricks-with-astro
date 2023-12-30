@@ -60,7 +60,7 @@ export default class CollectionProvider extends SupabaseProvider {
   getUserCollections = async () => {
     const { data, error } = await this.supabase
       .from('collections')
-      .select('id, trick_id (*)')
+      .select('id, trick_id (*, creators(name, picture))')
       .eq('user_id', this.userId);
 
     if (error) {

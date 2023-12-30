@@ -35,7 +35,7 @@ const { data: tricks } = await trickProvider.getTricks({
             preview={trick.preview}
             name={trick.name}
             types={trick.types ?? []}
-            creators={creators[trick.id] ?? []}
+            creators={trick.creators ?? []}
           />
         ))
       }

@@ -1,12 +1,7 @@
 import { redirectUrl } from '@/config';
-import { type Client } from '@/modules/supabase';
+import SupabaseProvider from '../supabase/provider';
 
-class AuthProvider {
-  supabase: Client;
-  constructor(supabase: Client) {
-    this.supabase = supabase;
-  }
-
+class AuthProvider extends SupabaseProvider {
   login = (email: string) => {
     return this.supabase.auth.signInWithOtp({
       email,
