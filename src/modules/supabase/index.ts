@@ -59,15 +59,21 @@ export const createSSRClient = (Astro: any) =>
     },
   });
 
-export const getClient = (Astro: any): Client => {
+export type ClientConfig =
+  | { ssr: true; Astro: any }
+  | { client: true; ssr?: false }
+  | { server: true; ssr?: false };
+
+export const getClient = (config?: ClientConfig): Client => {
   try {
-    if (Astro) {
-      return createSSRClient(Astro);
-    }
     if (window) {
       return createComponentClient();
     }
+    if (config?.ssr) {
+      return createSSRClient(config?.Astro);
+    }
   } catch (e) {
+    console.error(e);
     // accessing to window in server throw a error. We can ignore it and return the server client.
     return serverClient();
   }

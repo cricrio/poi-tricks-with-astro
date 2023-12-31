@@ -1,9 +1,9 @@
-import { getClient, type Client } from '.';
+import { getClient, type Client, type ClientConfig } from '.';
 
 export default class SupabaseProvider {
   supabase: Client;
 
-  constructor(Astro?: any) {
-    this.supabase = getClient(Astro);
+  constructor(config?: ClientConfig) {
+    this.supabase = getClient(config);
   }
 }

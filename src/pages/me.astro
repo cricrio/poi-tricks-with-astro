@@ -5,13 +5,22 @@ import TrickCard from '@/modules/tricks/components/TrickCard.astro';
 import CollectionHandler from '@/modules/collections/components/CollectionHandler.astro';
 
 import { createSSRClient } from '@/modules/supabase';
+import { transitionEnabledOnThisPage } from 'astro:transitions/client';
 
 const supabase = createSSRClient(Astro);
 const {
   data: { user },
 } = await supabase.auth.getUser();
 
-const collectionProvider = new CollectionProvider(user?.id);
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const collectionProvider = new CollectionProvider(user?.id, {
+  ssr: true,
+  Astro,
+});
+
 const userTricks = await collectionProvider.getUserCollections();
 const trickIds = userTricks.map((t) => t.id);
 

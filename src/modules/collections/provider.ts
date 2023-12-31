@@ -1,9 +1,10 @@
+import type { ClientConfig } from '../supabase';
 import SupabaseProvider from '../supabase/provider';
 
 export default class CollectionProvider extends SupabaseProvider {
   userId: string;
-  constructor(userId: string, Astro?: any) {
-    super(Astro);
+  constructor(userId: string, config?: ClientConfig) {
+    super(config);
     this.userId = userId;
   }
 
