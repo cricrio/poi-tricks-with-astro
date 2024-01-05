@@ -1,5 +1,6 @@
 ---
 import LoginInfo from '@/modules/user/components/LoginInfo';
+import Menu from './Menu.astro';
 
 interface Props {
   title: string;
@@ -49,14 +50,7 @@ const { title } = Astro.props;
         <!-- Page content here -->
         <slot />
       </div>
-      <div class='drawer-side'>
-        <label for='my-drawer-3' class='drawer-overlay'></label>
-        <ul class='menu p-4 w-80 min-h-full bg-base-200'>
-          <!-- Sidebar content here -->
-          <li><a>Sidebar Item 1</a></li>
-          <li><a>Sidebar Item 2</a></li>
-        </ul>
-      </div>
+      <Menu />
     </div>
   </body>
 </html>
