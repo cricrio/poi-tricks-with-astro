@@ -11,7 +11,7 @@ export async function getStaticPaths() {
   const trickProvider = new TrickProvider();
 
   const { data: tricks } = await trickProvider.getTricks({
-    edges: { creators: true, videos: true },
+    edges: { creators: true, videos: true, prerequisites: true },
   });
 
   return tricks?.map((trick) => ({
@@ -21,13 +21,6 @@ export async function getStaticPaths() {
 }
 
 const { trick } = Astro.props;
-
-const trickProvider = new TrickProvider();
-
-const { data: prerequisites } = await trickProvider.getTricks({
-  filter: { in: { key: 'id', values: trick.prerequisites } },
-  edges: { creators: true },
-});
 ---
 
 <Layout title={trick.name}>
@@ -65,7 +58,7 @@ const { data: prerequisites } = await trickProvider.getTricks({
         <h2 class='text-2xl mb-4'>Prerequisites</h2>
         <div class='flex gap-2 flex-col'>
           {
-            prerequisites?.map((trick) => (
+            trick.prerequisites?.map((trick) => (
               <a href={`/tricks/${trick.id}`} class='block'>
                 {trick.name}
                 <div class='badge badge-secondary ml-2 capitalize'>
@@ -101,7 +94,7 @@ const { data: prerequisites } = await trickProvider.getTricks({
       <h2 class='text-2xl mb-6'>Prerequisites</h2>
       <div class='flex gap-4 flex-col'>
         {
-          prerequisites?.map((trick) => (
+          trick.prerequisites?.map((trick) => (
             <TrickCard
               preview={trick.preview}
               id={trick.id}

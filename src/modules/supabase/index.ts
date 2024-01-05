@@ -73,7 +73,6 @@ export const getClient = (config?: ClientConfig): Client => {
       return createSSRClient(config?.Astro);
     }
   } catch (e) {
-    console.error(e);
     // accessing to window in server throw a error. We can ignore it and return the server client.
     return serverClient();
   }

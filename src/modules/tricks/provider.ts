@@ -14,6 +14,7 @@ class TrickProvider extends SupabaseProvider {
     edges?: {
       creators?: boolean;
       videos?: boolean;
+      prerequisites?: boolean;
     };
     limit?: number;
     count?: boolean;
@@ -21,9 +22,15 @@ class TrickProvider extends SupabaseProvider {
     const from = this.supabase.from('tricks');
 
     let query = (() => {
-      if (edges?.creators && edges?.videos) {
+      if (edges?.creators && edges?.videos && edges?.prerequisites) {
         return from.select(
-          '*, creators(name, picture), videos(source, externalId)',
+          '*, creators(name, picture), videos(source, externalId), prerequisites:trick_prerequisites!trick_id(node:prerequisite_id(*, creators(name, picture)))',
+          count ? { count: 'exact' } : undefined
+        );
+      }
+      if (edges?.prerequisites) {
+        return from.select(
+          '*, prerequisites:trick_prerequisites!trick_id(node:prerequisite_id(*))',
           count ? { count: 'exact' } : undefined
         );
       }
@@ -53,11 +60,20 @@ class TrickProvider extends SupabaseProvider {
     }
 
     const { data, count: trickCount, error } = await query;
+
     if (error) {
       console.error(error);
     }
 
-    return { data, count: trickCount };
+    return {
+      data: edges?.prerequisites
+        ? data?.map((trick) => ({
+            ...trick,
+            prerequisites: trick.prerequisites.map((p) => p.node) ?? [],
+          }))
+        : data,
+      count: trickCount,
+    };
   };
 }
 
