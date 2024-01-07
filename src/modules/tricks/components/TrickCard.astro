@@ -1,8 +1,8 @@
 ---
 import PreviewImage from './PreviewImage.astro';
-import SelectCategory from '../../collections/components/SaveInCollectionButton';
-import AvatarGroup from '../../creators/components/AvatarGroup.astro';
-import Avatar from '../../creators/components/Avatar.astro';
+import SelectCategory from '@/modules/collections/components/SaveButton';
+import AvatarGroup from '@/modules/creators/components/AvatarGroup.astro';
+import Avatar from '@/modules/creators/components/Avatar.astro';
 
 interface Props {
   id: string;
@@ -15,7 +15,7 @@ interface Props {
 const { name, id, preview, types, creators } = Astro.props;
 ---
 
-<div class='card card-compact bg-base-100 shadow-xl border border-base-content'>
+<div class='card card-compact shadow-xl border border-base-content'>
   <figure>
     <a href={`/tricks/${id}`} class='flex-1'>
       {
@@ -31,24 +31,27 @@ const { name, id, preview, types, creators } = Astro.props;
     </a>
   </figure>
   <div class='card-body'>
-    <div class='flex items-center gap-4'>
-      <AvatarGroup>
-        {
-          creators?.map((creator) => (
-            <Avatar src={creator.picture} name={creator.name} width='w-8' />
-          ))
-        }
-      </AvatarGroup>
-      <div>
-        {
-          creators?.map((creator, index) => (
-            <>
-              <a href={`/creators/${creator.id}`}>{creator.name}</a>
-              {index < creators.length - 1 && <span class='-ml-1'>,</span>}
-            </>
-          ))
-        }
+    <div class='flex justify-between'>
+      <div class='flex items-center gap-4'>
+        <AvatarGroup>
+          {
+            creators?.map((creator) => (
+              <Avatar src={creator.picture} name={creator.name} width='w-8' />
+            ))
+          }
+        </AvatarGroup>
+        <div>
+          {
+            creators?.map((creator, index) => (
+              <>
+                <a href={`/creators/${creator.id}`}>{creator.name}</a>
+                {index < creators.length - 1 && <span class='-ml-1'>,</span>}
+              </>
+            ))
+          }
+        </div>
       </div>
+      <SelectCategory client:only trickId={id} />
     </div>
     <a href={`/tricks/${id}`}>
       <h2 class='card-title'>{name}</h2>
@@ -62,7 +65,6 @@ const { name, id, preview, types, creators } = Astro.props;
             <div class='badge badge-secondary p-3'>{type}</div>
           ))
       }
-      <SelectCategory client:only trickId={id} />
     </div>
   </div>
 </div>

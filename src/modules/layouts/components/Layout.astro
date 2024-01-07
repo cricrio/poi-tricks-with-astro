@@ -1,7 +1,7 @@
 ---
 import LoginInfo from '@/modules/user/components/LoginInfo';
 import Menu from './Menu.astro';
-
+import './global.css';
 interface Props {
   title: string;
 }
@@ -19,12 +19,12 @@ const { title } = Astro.props;
     <meta name='generator' content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body class='min-h-screen'>
+  <body class='min-h-screen dark'>
     <div class='drawer'>
       <input id='my-drawer-3' type='checkbox' class='drawer-toggle' />
       <div class='drawer-content flex flex-col'>
         <!-- Navbar -->
-        <div class='w-full navbar bg-base-300 px-6'>
+        <div class='w-full navbar px-6'>
           <div class='flex-none lg:hidden'>
             <label for='my-drawer-3' class='btn btn-square btn-ghost'>
               <svg

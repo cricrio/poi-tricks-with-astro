@@ -1,5 +1,5 @@
 ---
-import SelectCategory from '@/modules/collections/components/SaveInCollectionButton';
+import SelectCategory from '@/modules/collections/components/SaveButton';
 import TrickCard from '@/modules/tricks/components/TrickCard.astro';
 import Layout from '@/modules/layouts/components/Layout.astro';
 import TrickProvider from '@/modules/tricks/provider';
@@ -39,8 +39,9 @@ const { trick } = Astro.props;
         <div>
           {trick.creators?.map((creator) => creator.name).join(', ')}
         </div>
+        <SelectCategory trickId={trick.id} client:only />
       </div>
-      <div class='flex gap-2 flex-wrap mb-6 lg:mb-10'>
+      <div class='flex gap-2 flex-wrap items-center mb-6 lg:mb-10'>
         <a
           class='badge badge-primary capitalize p-3'
           href=`/tricks/difficulty/${trick.difficulty}`>{trick.difficulty}</a
@@ -52,7 +53,6 @@ const { trick } = Astro.props;
               <div class='badge badge-secondary capitalize p-3'>{type}</div>
             ))
         }
-        <SelectCategory trickId={trick.id} client:load />
       </div>
       <div class='lg:hidden mb-10'>
         <h2 class='text-2xl mb-4'>Prerequisites</h2>
