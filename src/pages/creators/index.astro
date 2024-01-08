@@ -10,7 +10,9 @@ const { data: creatorList, count: creatorCount } =
 
 <Layout title={'Creators'}>
   <main class='mx-auto max-w-7xl w-full min-h-full p-4 md:p-8 lg:p-10'>
-    <h1 class='text-3xl mb-6 capitalize'>Creators</h1>
+    <h1 class='text-3xl font-bold mb-6 capitalize'>
+      Creators ({creatorList?.length})
+    </h1>
     <div
       class='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'
     >
